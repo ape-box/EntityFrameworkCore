@@ -3178,7 +3178,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         }
 
         [Fact]
-        public void Adding_inheritance_to_dependent_entity_types_throws()
+        public void Adding_inheritance_to_weak_entity_types_throws()
         {
             IMutableModel model = new Model();
             var customerType = model.AddEntityType(typeof(Customer));

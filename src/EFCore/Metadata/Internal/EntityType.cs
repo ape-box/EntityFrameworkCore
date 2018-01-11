@@ -346,6 +346,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
         ///     This API supports the Entity Framework Core infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        [DebuggerStepThrough]
         public virtual EntityType RootType() => (EntityType)((IEntityType)this).RootType();
 
         /// <summary>
@@ -466,7 +467,10 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             }
 
             PropertyMetadataChanged();
-            Model.ConventionDispatcher.OnPrimaryKeyChanged(Builder, oldPrimaryKey);
+            if (Builder != null)
+            {
+                Model.ConventionDispatcher.OnPrimaryKeyChanged(Builder, oldPrimaryKey);
+            }
 
             return _primaryKey;
         }
@@ -709,7 +713,10 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
 
             PropertyMetadataChanged();
 
-            Model.ConventionDispatcher.OnKeyRemoved(Builder, key);
+            if (Builder != null)
+            {
+                Model.ConventionDispatcher.OnKeyRemoved(Builder, key);
+            }
             return key;
         }
 
@@ -830,7 +837,7 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                 }
             }
 
-            if (!this.IsQueryType)
+            if (!IsQueryType)
             {
                 if (principalKey.ReferencingForeignKeys == null)
                 {
@@ -1849,6 +1856,13 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
             }
             _seedData.UnionWith(data);
         }
+
+        /// <summary>
+        ///     This API supports the Entity Framework Core infrastructure and is not intended to be used
+        ///     directly from your code. This API may change or be removed in future releases.
+        /// </summary>
+        public virtual IReadOnlyCollection<object> GetRawSeedData()
+            => _seedData;
 
         #endregion
 
