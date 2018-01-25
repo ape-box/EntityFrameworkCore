@@ -415,7 +415,24 @@ namespace Microsoft.EntityFrameworkCore.Metadata.Internal
                 var duplicateNavigation = Metadata.FindNavigationsInHierarchy(propertyName).FirstOrDefault();
                 if (duplicateNavigation != null)
                 {
-                    throw new InvalidOperationException(CoreStrings.PropertyCalledOnNavigation(propertyName, Metadata.DisplayName()));
+                    var foreignKey = duplicateNavigation.ForeignKey;
+
+                    if ((duplicateNavigation.IsDependentToPrincipal()
+                            ? foreignKey.GetDependentToPrincipalConfigurationSource()
+                            : foreignKey.GetPrincipalToDependentConfigurationSource())
+                        != ConfigurationSource.Convention)
+                    {
+                        throw new InvalidOperationException(CoreStrings.PropertyCalledOnNavigation(propertyName, Metadata.DisplayName()));
+                    }
+
+                    if (foreignKey.GetConfigurationSource() == ConfigurationSource.Convention)
+                    {
+                        RemoveForeignKey(foreignKey, ConfigurationSource.Convention);
+                    }
+                    else
+                    {
+                        Metadata.RemoveNavigation(duplicateNavigation.Name);
+                    }
                 }
 
                 property = clrProperty != null
